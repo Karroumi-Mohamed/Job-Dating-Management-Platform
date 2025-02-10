@@ -16,6 +16,8 @@ class Company extends Model
         'contact_email',
         'contact_phone'
     ];
+    
+    public $timestamps = true;
 
     public function announcements()
     {
