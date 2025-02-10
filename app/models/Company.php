@@ -11,14 +11,10 @@ class Company extends Model
     
     protected $fillable = [
         'name',
-        'description',
-        'location',
-        'contact_email',
-        'contact_phone'
+        'description'
     ];
-    
-    public $timestamps = true;
 
+    public $timestamps = true;
     public function announcements()
     {
         return $this->hasMany(Announcement::class);
