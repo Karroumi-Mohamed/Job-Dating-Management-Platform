@@ -15,7 +15,6 @@ class Company extends Model
     ];
 
     public $timestamps = true;
-
     public function announcements()
     {
         return $this->hasMany(Announcement::class);
