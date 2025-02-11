@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Core\Controller;
@@ -61,6 +62,7 @@ class AuthController extends Controller
         }
 
         $data['password'] = Security::hashPassword($data['password']);
+        $data['role_id'] = 2;
         User::create($data);
 
         $this->success('Registration successful');
