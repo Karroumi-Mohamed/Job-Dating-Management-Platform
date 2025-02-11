@@ -17,3 +17,10 @@
 // Router::post('/admin/announcements/delete/{id}', [AdminController::class, 'deleteAnnouncement']);
 // Router::post('/admin/announcements/restore/{id}', [AdminController::class, 'restoreAnnouncement']);
 
+use App\Controllers\AuthController;
+use App\Core\Router;
+
+Router::get('/login', [AuthController::class , 'showLogin']);
+Router::get('/register', [AuthController::class , 'showRegister']);
+
+
