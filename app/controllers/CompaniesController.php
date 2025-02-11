@@ -7,7 +7,7 @@ use App\Core\View;
 use App\Core\Auth;
 use App\Models\Company;
 
-class CompanyController extends Controller
+class CompaniesController extends Controller
 {
     public function __construct()
     {
