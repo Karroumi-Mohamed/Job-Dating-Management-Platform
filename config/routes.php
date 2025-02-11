@@ -22,5 +22,7 @@ use App\Core\Router;
 
 Router::get('/login', [AuthController::class , 'showLogin']);
 Router::get('/register', [AuthController::class , 'showRegister']);
+Router::post('/login', [AuthController::class , 'login']);
+Router::post('/register', [AuthController::class , 'register']);
 
 
