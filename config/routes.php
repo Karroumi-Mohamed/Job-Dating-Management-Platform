@@ -18,11 +18,13 @@
 // Router::post('/admin/announcements/restore/{id}', [AdminController::class, 'restoreAnnouncement']);
 
 use App\Controllers\AuthController;
+use App\Controllers\CompaniesController;
+use App\Core\Auth;
 use App\Core\Router;
 
-Router::get('/login', [AuthController::class , 'showLogin']);
-Router::get('/register', [AuthController::class , 'showRegister']);
-Router::post('/login', [AuthController::class , 'login']);
-Router::post('/register', [AuthController::class , 'register']);
-
-
+Router::get('/companies', [CompaniesController::class, 'index']);
+Router::get('/login', [AuthController::class, 'showLogin']);
+Router::get('/register', [AuthController::class, 'showRegister']);
+Router::post('/register', [AuthController::class, 'register']);
+Router::post('/login', [AuthController::class, 'login']);
+Router::get('/logout', [AuthController::class, 'logout']);
