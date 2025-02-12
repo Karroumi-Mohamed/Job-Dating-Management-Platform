@@ -21,9 +21,11 @@
 use App\Controllers\AnnoncementsController;
 use App\Controllers\AuthController;
 use App\Controllers\CompaniesController;
+use App\Controllers\ListAnnouncesController;
 use App\Core\Auth;
 use App\Core\Router;
 
+Router::get('/Listannounces', [ListAnnouncesController::class, 'index']);
 Router::get('/companies', [CompaniesController::class, 'index']);
 Router::get('/login', [AuthController::class, 'showLogin']);
 Router::get('/register', [AuthController::class, 'showRegister']);
