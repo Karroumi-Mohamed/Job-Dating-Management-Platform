@@ -14,17 +14,33 @@
         </div>
     {% endif %}
 {% endif %}
+
+        <div style="text-align: right; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="/companies/trash" style="text-decoration: none; padding: 10px 15px; background-color: #ff4d4d; color: white; border-radius: 5px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" viewBox="0 0 20 20" fill="currentColor" style="width: 20px; height: 20px; vertical-align: middle;">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-.894.553L4 4H2a1 1 0 000 2h1v10a2 2 0 002 2h8a2 2 0 002-2V6h1a1 1 0 100-2h-2l-.106-.447A1 1 0 0014 2H6zm3 4a1 1 0 112 0v7a1 1 0 11-2 0V6z" clip-rule="evenodd"/>
+                    </svg>
+                    Corbeille
+                </a>
+                <a href="/companies/create{{ company.id }}" style="text-decoration: none; padding: 10px 15px; background-color: #2E8B57; color: white; border-radius: 5px;">Create new Companie </a>
+            </div>
+        </div>
+
         <table style="width: 100%; border-collapse: collapse; background-color: white;">
             <thead>
                 <tr style="background-color: #2E8B57; color: white;">
                     <th style="padding: 10px; text-align: left;">Nom de la Compagnie</th>
+                    <th style="padding: 10px; text-align: center;">Description</th>
                     <th style="padding: 10px; text-align: center;">Actions</th>
+
                 </tr>
             </thead>
             <tbody>
                 {% for company in companies %}
                     <tr style="border-bottom: 1px solid #ddd;">
                         <td style="padding: 10px;">{{ company.name }}</td>
+                        <td style="padding: 10px;">{{ company.description }}</td>
                         <td style="padding: 10px; text-align: center;">
                             <div style="display: inline-flex; align-items: center; gap: 5px;">
                                 <a href="/companies/edit/{{ company.id }}" title="Éditer" style="text-decoration: none; padding: 5px 10px; background-color: #2E8B57; color: white; border-radius: 5px;">

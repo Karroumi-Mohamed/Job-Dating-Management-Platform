@@ -1,0 +1,39 @@
+{% extends "layouts/default.twig" %}
+
+{% block content %}
+    <div style="max-width: 800px; margin: auto; padding: 20px;">
+        <h2 style="text-align: center; color: #2E8B57;">Liste des Companies supprimées</h2>
+        <div style="text-align: right; margin-bottom: 20px;">
+            <a href="/companies" style="text-decoration: none; padding: 10px 15px; background-color: #2E8B57; color: white; border-radius: 5px;">Retour</a>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; background-color: white;">
+            <thead>
+                <tr style="background-color: #2E8B57; color: white;">
+                    <th style="padding: 10px; text-align: left;">Nom de la Company</th>
+                    <th style="padding: 10px; text-align: left;">Description</th>
+                    <th style="padding: 10px; text-align: center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for company in companies %}
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 10px;">{{ company.name }}</td>
+                    <td style="padding: 10px;">{{ company.description }}</td>
+                    <td style="padding: 10px; text-align: center;">
+                        <form action="/companies/restore/{{ company.id }}" method="post" title="Restaurer" style="display: inline;">
+                            <input type="hidden" name="token" value="{{ csrf_token() }}">
+                            <button type="submit" style="text-decoration: none; padding: 5px 10px; background-color: #2E8B57; color: white; border-radius: 5px; border: none; cursor: pointer;">
+                                Restaurer
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="padding: 10px; text-align: center;">Aucune company supprimée</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %} 

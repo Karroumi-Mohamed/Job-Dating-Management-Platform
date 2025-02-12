@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Core\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Announcement extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'announcements';
-    protected $softDelete = true;
+    protected $dates = ['deleted_at'];
     
     protected $fillable = [
         'title',

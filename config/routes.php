@@ -1,22 +1,5 @@
 <?php
 
-// use App\Controllers\AdminController;
-
-// // Routes Admin
-// Router::get('/admin', [AdminController::class, 'dashboard']);
-
-// // Gestion des entreprises
-// Router::get('/admin/companies', [AdminController::class, 'companies']);
-// Router::post('/admin/companies/create', [AdminController::class, 'createCompany']);
-// Router::post('/admin/companies/edit/{id}', [AdminController::class, 'editCompany']);
-
-// // Gestion des annonces
-// Router::get('/admin/announcements', [AdminController::class, 'announcements']);
-// Router::post('/admin/announcements/create', [AdminController::class, 'createAnnouncement']);
-// Router::post('/admin/announcements/edit/{id}', [AdminController::class, 'editAnnouncement']);
-// Router::post('/admin/announcements/delete/{id}', [AdminController::class, 'deleteAnnouncement']);
-// Router::post('/admin/announcements/restore/{id}', [AdminController::class, 'restoreAnnouncement']);
-
 use App\Controllers\AnnoncementsController;
 use App\Controllers\AuthController;
 use App\Controllers\CompaniesController;
@@ -35,7 +18,17 @@ Router::post('/companies/create', [CompaniesController::class, 'store']);
 Router::get('/companies/edit/{id}', [CompaniesController::class, 'edit']);
 Router::post('/companies/edit/{id}', [CompaniesController::class, 'update']);
 Router::post('/companies/delete/{id}', [CompaniesController::class, 'delete']);
+Router::post('/companies/restore/{id}', [CompaniesController::class, 'restore']);
+Router::get('/companies/trash', [CompaniesController::class, 'trash']);
+
+Router::get('/announcements/trash', [AnnoncementsController::class, 'trash']);
+
+Router::post('/announcements/restore/{id}', [AnnoncementsController::class, 'restore']);
 
 Router::get('/Listannounces', [ListAnnouncesController::class, 'index']);
 Router::get('/announcements', [AnnoncementsController::class, 'index']);
+Router::get('/announcements/create', [AnnoncementsController::class, 'create']);
+Router::post('/announcements/store', [AnnoncementsController::class, 'store']);
+Router::get('/announcements/edit/{id}', [AnnoncementsController::class, 'edit']);
+Router::post('/announcements/update/{id}', [AnnoncementsController::class, 'update']);
 Router::post('/announcements/delete/{id}', [AnnoncementsController::class, 'delete']);

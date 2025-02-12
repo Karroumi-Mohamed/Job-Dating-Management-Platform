@@ -131,4 +131,10 @@ class AnnoncementsController extends Controller
         header('Location: /announcements');
         exit;
     }
+
+    public function trash()
+    {
+        $trashAnnouncements = Announcement::onlyTrashed()->orderBy('title')->get();
+        View::render('announcement/trash', ['announcements' => $trashAnnouncements]);
+    }
 }
