@@ -35,6 +35,7 @@ class Router
         $uri = parse_url($uri, PHP_URL_PATH);
         $method = strtoupper($method);
 
+
         if (!isset($this->routes[$method])) {
             return $this->notFound();
         }
