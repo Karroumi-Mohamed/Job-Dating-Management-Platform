@@ -17,13 +17,13 @@ class Model extends Eloquent
         return static::query()->find($id, $columns);
     }
 
-    public static function findOrFail($id, $columns = ['*'])
+    public static function findOrFail($id)
     {
-        $result = static::find($id, $columns);
-        if (!$result) {
-            throw new \Exception('No record found');
+        $record = static::find($id);
+        if (!$record) {
+            throw new \Exception("No record found");
         }
-        return $result;
+        return $record;
     }
 
     public static function create(array $attributes = [])

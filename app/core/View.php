@@ -27,6 +27,12 @@ class View
             return Security::generateCsrfToken();
         }));
 
+        if (Session::has('flash')) {
+            $message = Session::get('flash');
+            Session::remove('flash');
+            self::$twig->addGlobal('message', $message);
+        }
+
         self::$twig->addFunction(new TwigFunction('session', function () {
             return new class {
                 public function has($key) {
@@ -39,7 +45,9 @@ class View
                 }
             };
         }));
+
     }
+
 
     public static function render($view, $data = [])
     {

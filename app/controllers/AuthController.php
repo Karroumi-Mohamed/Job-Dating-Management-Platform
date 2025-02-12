@@ -35,7 +35,7 @@ class AuthController extends Controller
             exit;
         }
 
-        $this->error('Invalid credentials');
+        $this->error('Invalid username or password');
         header('Location: /login');
         exit;
     }

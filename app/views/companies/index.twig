@@ -3,6 +3,17 @@
 {% block content %}
     <div style="max-width: 800px; margin: auto; padding: 20px;">
         <h2 style="text-align: center; color: #2E8B57;">Liste des Compagnies</h2>
+{% if message is not empty %}
+    {% if message.type == 'success' %}
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+            <p>{{ message.message }}</p>
+        </div>
+    {% else %}
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+            <p>{{ message.message }}</p>
+        </div>
+    {% endif %}
+{% endif %}
         <table style="width: 100%; border-collapse: collapse; background-color: white;">
             <thead>
                 <tr style="background-color: #2E8B57; color: white;">

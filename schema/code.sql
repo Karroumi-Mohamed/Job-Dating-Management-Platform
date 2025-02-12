@@ -49,3 +49,5 @@ CREATE TABLE IF NOT EXISTS announcements (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP WITH TIME ZONE
 );
+INSERT INTO roles (name) VALUES ('admin');
+INSERT INTO roles (name) VALUES ('learner');
