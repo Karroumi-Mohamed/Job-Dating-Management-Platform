@@ -4,130 +4,114 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\View;
 use App\Core\Auth;
-use App\Core\Middleware;
-use App\Core\Security;
 use App\Models\Announcement;
 use App\Models\Company;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+use PDO;
+use Exception;
 
 class AnnoncementsController extends Controller
 {
+    protected $twig;
+
     public function __construct()
     {
-        Middleware::handleRole('admin');
+        // Vide pour l'instant
     }
 
     public function index()
     {
-        $announcements = Announcement::with('company')->orderBy('created_at', 'desc')->get();
-        View::render('announcements/index', ['announcements' => $announcements]);
+        try {
+            $announcements = Announcement::with('company')->orderBy('created_at', 'desc')->get();
+            return View::render('announcement/index', [
+                'announcements' => $announcements
+            ]);
+        } catch (Exception $e) {
+            die("Erreur de base de données: " . $e->getMessage());
+        }
     }
 
     public function create()
     {
-        $companies = Company::orderBy('name')->get();
+        if (!Auth::hasRole('admin')) {
+            $this->error('Unauthorized access');
+            header('Location: /announcements');
+            exit;
+        }
+
+        $companies = Company::all();
         View::render('announcements/create', ['companies' => $companies]);
     }
 
     public function store()
     {
-        $cleaned = Security::clean($_POST);
-        if (!Security::validateCsrfToken($cleaned['token'])) {
-            $this->error('Invalid Request');
+        if (!Auth::hasRole('admin')) {
+            $this->error('Unauthorized access');
             header('Location: /announcements');
             exit;
         }
 
-        try {
-            if (empty($cleaned['title']) || empty($cleaned['description']) || empty($cleaned['company_id'])) {
-                throw new \Exception('All fields are required');
-            }
+        $data = [
+            'title' => $_POST['title'],
+            'description' => $_POST['description'],
+            'company_id' => $_POST['company_id']
+        ];
 
-            // Verify company exists
-            Company::findOrFail($cleaned['company_id']);
-
-            $data = [
-                'title' => $cleaned['title'],
-                'description' => $cleaned['description'],
-                'company_id' => $cleaned['company_id']
-            ];
-
-            Announcement::create($data);
-            $this->success('Announcement created successfully');
-            header('Location: /announcements');
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-            header('Location: /announcements/create');
-        }
+        Announcement::create($data);
+        $this->success('Announcement created successfully');
+        header('Location: /announcements');
         exit;
     }
 
     public function edit($id)
     {
-        try {
-            $announcement = Announcement::findOrFail($id);
-            $companies = Company::orderBy('name')->get();
-            View::render('announcements/edit', [
-                'announcement' => $announcement,
-                'companies' => $companies
-            ]);
-        } catch (\Exception $e) {
-            $this->error('Announcement not found');
+        if (!Auth::hasRole('admin')) {
+            $this->error('Unauthorized access');
             header('Location: /announcements');
             exit;
         }
+
+        $announcement = Announcement::findOrFail($id);
+        $companies = Company::all();
+        View::render('announcements/edit', [
+            'announcement' => $announcement,
+            'companies' => $companies
+        ]);
     }
 
     public function update($id)
     {
-        $cleaned = Security::clean($_POST);
-        if (!Security::validateCsrfToken($cleaned['token'])) {
-            $this->error('Invalid Request');
+        if (!Auth::hasRole('admin')) {
+            $this->error('Unauthorized access');
             header('Location: /announcements');
             exit;
         }
 
-        try {
-            $announcement = Announcement::findOrFail($id);
-            
-            if (empty($cleaned['title']) || empty($cleaned['description']) || empty($cleaned['company_id'])) {
-                throw new \Exception('All fields are required');
-            }
+        $announcement = Announcement::findOrFail($id);
+        $announcement->update([
+            'title' => $_POST['title'],
+            'description' => $_POST['description'],
+            'company_id' => $_POST['company_id']
+        ]);
 
-            // Verify company exists
-            Company::findOrFail($cleaned['company_id']);
-            
-            $announcement->update([
-                'title' => $cleaned['title'],
-                'description' => $cleaned['description'],
-                'company_id' => $cleaned['company_id']
-            ]);
-
-            $this->success('Announcement updated successfully');
-            header('Location: /announcements');
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-            header('Location: /announcements/edit/' . $id);
-        }
+        $this->success('Announcement updated successfully');
+        header('Location: /announcements');
         exit;
     }
 
     public function delete($id)
     {
-        $cleaned = Security::clean($_POST);
-        if (!Security::validateCsrfToken($cleaned['token'])) {
-            $this->error('Invalid Request');
+        if (!Auth::hasRole('admin')) {
+            $this->error('Unauthorized access');
             header('Location: /announcements');
             exit;
         }
 
-        try {
-            $announcement = Announcement::findOrFail($id);
-            $announcement->delete();
-            $this->success('Announcement deleted successfully');
-        } catch (\Exception $e) {
-            $this->error('Announcement not found');
-        }
+        $announcement = Announcement::findOrFail($id);
+        $announcement->delete();
 
+        $this->success('Announcement deleted successfully');
         header('Location: /announcements');
         exit;
     }
