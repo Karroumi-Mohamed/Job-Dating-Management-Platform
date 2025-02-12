@@ -11,6 +11,12 @@ use App\Models\Role;
 
 class AuthController extends Controller
 {
+    public function __construct(){
+        if (Auth::check()) {
+            header('Location: /');
+            exit;
+        }
+    }
     public function showLogin()
     {
         View::render('auth/login');
