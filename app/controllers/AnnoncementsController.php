@@ -6,21 +6,30 @@ use App\Core\View;
 use App\Core\Auth;
 use App\Models\Announcement;
 use App\Models\Company;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+use PDO;
+use Exception;
 
-class AnnouncementController extends Controller
+class AnnoncementsController extends Controller
 {
+    protected $twig;
+
     public function __construct()
     {
-        if (!Auth::check()) {
-            header('Location: /login');
-            exit;
-        }
+        // Vide pour l'instant
     }
 
     public function index()
     {
-        $announcements = Announcement::with('company')->orderBy('created_at', 'desc')->get();
-        View::render('announcements/index', ['announcements' => $announcements]);
+        try {
+            $announcements = Announcement::with('company')->orderBy('created_at', 'desc')->get();
+            return View::render('announcement/index', [
+                'announcements' => $announcements
+            ]);
+        } catch (Exception $e) {
+            die("Erreur de base de données: " . $e->getMessage());
+        }
     }
 
     public function create()
