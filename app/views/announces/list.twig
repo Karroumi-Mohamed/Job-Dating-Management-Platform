@@ -1,0 +1,74 @@
+{% extends "layouts/auth.twig" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <!-- Logout Button -->
+    <div class="absolute top-4 left-4">
+        <a href="/logout" 
+           class="px-4 py-2 bg-red-600 text-white rounded-lg border-2 border-gray-800 hover:bg-red-800 transition font-bold flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+            Logout
+        </a>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900">
+                <span class="text-green-500 ">J</span>ob Dating Announcements
+            </h2>
+            <p class="mt-2 text-gray-600">Discover your next career opportunity</p>
+        </div>
+
+        <!-- Announcements Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  ">
+            {% for announcement in announcements %}
+            <div class="bg-white rounded-xl hover:shadow-[8px_8px_#030101] p-6 border-4 border-gray-800 hover:border-green-500 transform transition duration-200 ">
+                <!-- Company Logo/Name -->
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center border-2 border-gray-800">
+                        <span class="text-xl font-bold">{{ announcement.company.name|slice(0, 1) }}</span>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="font-bold text-lg">{{ announcement.company.name }}</h3>
+                    </div>
+                </div>
+
+                <!-- Announcement Details -->
+                <h4 class="text-xl font-bold mb-2">{{ announcement.title }}</h4>
+                <p class="text-gray-600 mb-4">{{ announcement.description }}</p>
+
+                <!-- Date -->
+                <div class="flex items-center justify-end mt-4 pt-4 border-t border-gray-200  font-bold">
+                    <span class="text-sm text-gray-600">
+                        Posted on {{ announcement.created_at|date("M d, Y") }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- No Announcements Message -->
+        {% if announcements|length == 0 %}
+        <div class="text-center py-12">
+            <h3 class="text-xl font-medium text-gray-900">No announcements available at the moment</h3>
+            <p class="mt-2 text-gray-600">Please check back later for new opportunities</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if session().has('error') %}
+    <div class="fixed top-4 right-4 bg-red-50 border-l-4 border-red-400 p-4 rounded-lg shadow-lg" role="alert">
+        <p class="text-red-700">{{ session().get('error') }}</p>
+    </div>
+{% endif %}
+
+{% if session().has('success') %}
+    <div class="fixed top-4 right-4 bg-green-50 border-l-4 border-green-400 p-4 rounded-lg shadow-lg" role="alert">
+        <p class="text-green-700">{{ session().get('success') }}</p>
+    </div>
+{% endif %}
+{% endblock %}
