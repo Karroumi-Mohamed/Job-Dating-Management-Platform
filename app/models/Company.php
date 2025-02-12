@@ -3,18 +3,21 @@
 namespace App\Models;
 
 use App\Core\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Company extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'companies';
-    protected $softDelete = true;
+    
+    protected $dates = ['deleted_at'];
     
     protected $fillable = [
         'name',
         'description'
     ];
 
-    public $timestamps = true;
     public function announcements()
     {
         return $this->hasMany(Announcement::class);
