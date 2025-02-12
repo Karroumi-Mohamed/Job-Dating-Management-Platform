@@ -38,6 +38,10 @@ Router::post('/companies/delete/{id}', [CompaniesController::class, 'delete']);
 Router::post('/companies/restore/{id}', [CompaniesController::class, 'restore']);
 Router::get('/companies/trash', [CompaniesController::class, 'trash']);
 
+Router::get('/announcements/trash', [AnnoncementsController::class, 'trash']);
+
+Router::post('/announcements/restore/{id}', [AnnoncementsController::class, 'restore']);
+
 Router::get('/listannounces', [ListAnnouncesController::class, 'index']);
 Router::get('/announcements', [AnnoncementsController::class, 'index']);
 Router::post('/announcements/delete/{id}', [AnnoncementsController::class, 'delete']);
