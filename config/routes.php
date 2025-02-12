@@ -19,12 +19,17 @@
 
 use App\Controllers\AuthController;
 use App\Controllers\CompaniesController;
-use App\Core\Auth;
 use App\Core\Router;
 
-Router::get('/companies', [CompaniesController::class, 'index']);
 Router::get('/login', [AuthController::class, 'showLogin']);
 Router::get('/register', [AuthController::class, 'showRegister']);
 Router::post('/register', [AuthController::class, 'register']);
 Router::post('/login', [AuthController::class, 'login']);
 Router::get('/logout', [AuthController::class, 'logout']);
+
+Router::get('/companies', [CompaniesController::class, 'index']);
+Router::get('/companies/create', [CompaniesController::class, 'create']);
+Router::post('/companies/create', [CompaniesController::class, 'store']);
+Router::get('/companies/edit/{id}', [CompaniesController::class, 'edit']);
+Router::post('/companies/edit/{id}', [CompaniesController::class, 'update']);
+Router::post('/companies/delete/{id}', [CompaniesController::class, 'delete']);

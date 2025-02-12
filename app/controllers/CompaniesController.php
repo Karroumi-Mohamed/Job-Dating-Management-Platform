@@ -5,16 +5,16 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\View;
 use App\Core\Auth;
+use App\Core\Middleware;
+use App\Core\Security;
 use App\Models\Company;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CompaniesController extends Controller
 {
     public function __construct()
     {
-        if (!Auth::check()) {
-            header('Location: /login');
-            exit;
-        }
+        Middleware::handleRole('admin');
     }
 
     public function index()
@@ -25,26 +25,21 @@ class CompaniesController extends Controller
 
     public function create()
     {
-        if (!Auth::hasRole('admin')) {
-            $this->error('Unauthorized access');
-            header('Location: /companies');
-            exit;
-        }
-
         View::render('companies/create');
     }
 
     public function store()
     {
-        if (!Auth::hasRole('admin')) {
-            $this->error('Unauthorized access');
+        $cleaned = Security::clean($_POST);
+        if (!Security::validateCsrfToken($cleaned['token'])) {
+            $this->error('Invalid Request');
             header('Location: /companies');
             exit;
         }
 
         $data = [
-            'name' => $_POST['name'],
-            'description' => $_POST['description']
+            'name' => $cleaned['name'],
+            'description' => $cleaned['description']
         ];
 
         Company::create($data);
@@ -55,48 +50,74 @@ class CompaniesController extends Controller
 
     public function edit($id)
     {
-        if (!Auth::hasRole('admin')) {
-            $this->error('Unauthorized access');
+        try {
+            $company = Company::findOrFail($id);
+            View::render('companies/edit', ['company' => $company]);
+        } catch (\Exception $e) {
+            $this->error('Company not found');
             header('Location: /companies');
             exit;
         }
-
-        $company = Company::findOrFail($id);
-        View::render('companies/edit', ['company' => $company]);
     }
 
     public function update($id)
     {
-        if (!Auth::hasRole('admin')) {
-            $this->error('Unauthorized access');
+        $cleaned = Security::clean($_POST);
+        if (!Security::validateCsrfToken($cleaned['token'])) {
+            $this->error('Invalid Request');
             header('Location: /companies');
             exit;
         }
 
-        $company = Company::findOrFail($id);
-        $company->update([
-            'name' => $_POST['name'],
-            'description' => $_POST['description']
-        ]);
+        try {
+            $company = Company::find($id);
+            
+            if (empty($cleaned['name'])) {
+                $this->error('Name is required');
+                header('Location: /companies/edit/' . $id);
+                exit;
+            }
+            
+            $company->update([
+                'name' => $cleaned['name'],
+                'description' => $cleaned['description']
+            ]);
 
-        $this->success('Company updated successfully');
-        header('Location: /companies');
+            $this->success('Company updated successfully');
+            header('Location: /companies');
+        } catch (\Exception $e) {
+            $this->error('Company not found');
+            header('Location: /companies');
+        }
         exit;
     }
 
     public function delete($id)
     {
-        if (!Auth::hasRole('admin')) {
-            $this->error('Unauthorized access');
+        $cleaned = Security::clean($_POST);
+        if (!Security::validateCsrfToken($cleaned['token'])) {
+            $this->error('Invalid Request');
             header('Location: /companies');
             exit;
         }
 
-        $company = Company::findOrFail($id);
-        $company->delete();
-
-        $this->success('Company deleted successfully');
-        header('Location: /companies');
+        try {
+            $company = Company::findOrFail($id);
+            
+            // Check if company has related announcements before deletion
+            if ($company->announcements()->count() > 0) {
+                $this->error('Company has related announcements');
+                header('Location: /companies');
+                exit;
+            }
+            
+            $company->delete();
+            $this->success('Company deleted successfully');
+            header('Location: /companies');
+        } catch (\Exception $e) {
+            $this->error('Company not found');
+            header('Location: /companies');
+        }
         exit;
     }
 }
