@@ -103,8 +103,6 @@ class CompaniesController extends Controller
 
         try {
             $company = Company::findOrFail($id);
-            
-            // Check if company has related announcements before deletion
             if ($company->announcements()->count() > 0) {
                 $this->error('Company has related announcements');
                 header('Location: /companies');
@@ -119,5 +117,27 @@ class CompaniesController extends Controller
             header('Location: /companies');
         }
         exit;
+    }
+
+    public function restore($id)
+    {
+        if (!Auth::hasRole('admin')) {
+            $this->error('Unauthorized access');
+            header('Location: /companies');
+            exit;
+        }
+
+        $company = Company::withTrashed()->findOrFail($id);
+        $company->restore();
+
+        $this->success('Company restored successfully');
+        header('Location: /companies');
+        exit;
+    }
+
+    public function trash()
+    {
+        $trashCompanies = Company::onlyTrashed()->orderBy('name')->get();
+        View::render('companies/trash', ['companies' => $trashCompanies]);
     }
 }
