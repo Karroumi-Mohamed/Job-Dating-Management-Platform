@@ -17,6 +17,8 @@
 // Router::post('/admin/announcements/delete/{id}', [AdminController::class, 'deleteAnnouncement']);
 // Router::post('/admin/announcements/restore/{id}', [AdminController::class, 'restoreAnnouncement']);
 
+
+use App\Controllers\AnnoncementsController;
 use App\Controllers\AuthController;
 use App\Controllers\CompaniesController;
 use App\Controllers\ListAnnouncesController;
@@ -30,3 +32,5 @@ Router::get('/register', [AuthController::class, 'showRegister']);
 Router::post('/register', [AuthController::class, 'register']);
 Router::post('/login', [AuthController::class, 'login']);
 Router::get('/logout', [AuthController::class, 'logout']);
+Router::get('/announcements', [AnnoncementsController::class, 'index']);
+Router::post('/announcements/delete/{id}', [AnnoncementsController::class, 'delete']);
