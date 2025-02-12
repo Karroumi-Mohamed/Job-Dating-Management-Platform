@@ -35,6 +35,8 @@ Router::post('/companies/create', [CompaniesController::class, 'store']);
 Router::get('/companies/edit/{id}', [CompaniesController::class, 'edit']);
 Router::post('/companies/edit/{id}', [CompaniesController::class, 'update']);
 Router::post('/companies/delete/{id}', [CompaniesController::class, 'delete']);
+Router::post('/companies/restore/{id}', [CompaniesController::class, 'restore']);
+Router::get('/companies/trash', [CompaniesController::class, 'trash']);
 
 Router::get('/listannounces', [ListAnnouncesController::class, 'index']);
 Router::get('/announcements', [AnnoncementsController::class, 'index']);
