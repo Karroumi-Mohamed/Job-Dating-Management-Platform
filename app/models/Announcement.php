@@ -15,7 +15,8 @@ class Announcement extends Model
     protected $fillable = [
         'title',
         'description',
-        'company_id'
+        'company_id',
+        'image'
     ];
 
     public $timestamps = true;

@@ -1,14 +1,24 @@
 <table style="width: 100%; border-collapse: collapse; background-color: white;">
     <thead>
         <tr style="background-color: #2E8B57; color: white;">
-            <th style="padding: 10px; text-align: left;">Nom de la Compagnie</th>
-            <th style="padding: 10px; text-left: left;">Description</th>
+            <th style="padding: 10px; text-align: left;">Logo</th>
+            <th style="padding: 10px; text-align: left;">Company Name</th>
+            <th style="padding: 10px; text-align: left;">Description</th>
             <th style="padding: 10px; text-align: center;">Actions</th>
         </tr>
     </thead>
     <tbody>
         {% for company in companies %}
             <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 10px; width: 100px;">
+                    {% if company.logo %}
+                        <img src="/{{ company.logo }}" alt="{{ company.name }}" style="max-width: 80px; max-height: 80px; object-fit: contain;">
+                    {% else %}
+                        <div style="width: 80px; height: 80px; background-color: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                            <span style="color: #9ca3af;">No Logo</span>
+                        </div>
+                    {% endif %}
+                </td>
                 <td style="padding: 10px;">{{ company.name }}</td>
                 <td style="padding: 10px;">{{ company.description }}</td>
                 <td style="padding: 10px; text-align: center;">
@@ -28,7 +38,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="3" style="padding: 10px; text-align: center;">Aucune compagnie trouvée</td>
+                <td colspan="4" style="padding: 10px; text-align: center;">No companies found</td>
             </tr>
         {% endfor %}
     </tbody>

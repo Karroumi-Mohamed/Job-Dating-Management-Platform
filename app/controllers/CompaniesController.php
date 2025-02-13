@@ -9,6 +9,7 @@ use App\Core\Middleware;
 use App\Core\Security;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Core\FileUploader;
 
 class CompaniesController extends Controller
 {
@@ -51,7 +52,18 @@ class CompaniesController extends Controller
                 'description' => $cleaned['description']
             ];
 
-            Company::create($data);
+
+            if (isset($_FILES['logo']) && $_FILES['logo']['error'] === 0) {
+                $logoPath = FileUploader::upload($_FILES['logo'], 'companies/');
+                if ($logoPath === false) {
+                    throw new \Exception('Error uploading logo');
+                }
+                $data['logo'] = $logoPath;
+            }
+
+            $company = Company::create($data);
+            
+
 
             if ($this->isApiRequest()) {
                 return $this->jsonResponse(['message' => 'Company created successfully']);
@@ -60,6 +72,7 @@ class CompaniesController extends Controller
             $this->success('Company created successfully');
             header('Location: /companies');
         } catch (\Exception $e) {
+            error_log('Error creating company: ' . $e->getMessage());
             if ($this->isApiRequest()) {
                 return $this->jsonResponse(['error' => $e->getMessage()], 400);
             }
@@ -85,24 +98,35 @@ class CompaniesController extends Controller
     {
         $cleaned = Security::clean($_POST);
         if (!Security::validateCsrfToken($cleaned['token'])) {
-            $this->error('Invalid Request');
-            header('Location: /companies');
-            exit;
+            return $this->jsonResponse(['error' => 'Invalid Request'], 403);
         }
 
         try {
-            $company = Company::find($id);
+            $company = Company::findOrFail($id);
             
             if (empty($cleaned['name'])) {
-                $this->error('Name is required');
-                header('Location: /companies/edit/' . $id);
-                exit;
+                throw new \Exception('Name is required');
             }
             
-            $company->update([
+            $data = [
                 'name' => $cleaned['name'],
                 'description' => $cleaned['description']
-            ]);
+            ];
+
+
+            if (isset($_FILES['logo']) && $_FILES['logo']['error'] === 0) {
+
+                if ($company->logo) {
+                    FileUploader::delete($company->logo);
+                }
+                
+                $logoPath = FileUploader::upload($_FILES['logo'], 'companies/');
+                if ($logoPath) {
+                    $data['logo'] = $logoPath;
+                }
+            }
+            
+            $company->update($data);
 
             $this->success('Company updated successfully');
             header('Location: /companies');
@@ -122,8 +146,11 @@ class CompaniesController extends Controller
 
         try {
             $company = Company::findOrFail($id);
-            
-            // Check for related announcements
+
+            if ($company->logo) {
+                FileUploader::delete($company->logo);
+            }
+
             if ($company->announcements()->count() > 0) {
                 if ($this->isApiRequest()) {
                     return $this->jsonResponse(['error' => 'Cannot delete company with existing announcements'], 400);

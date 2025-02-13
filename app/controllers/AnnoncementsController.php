@@ -8,6 +8,7 @@ use App\Core\Middleware;
 use App\Core\Security;
 use App\Models\Announcement;
 use App\Models\Company;
+use App\Core\FileUploader;
 
 class AnnoncementsController extends Controller
 {
@@ -64,6 +65,14 @@ class AnnoncementsController extends Controller
                 'company_id' => $cleaned['company_id']
             ];
 
+            // Handle image upload
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+                $imagePath = FileUploader::upload($_FILES['image'], 'announcements/');
+                if ($imagePath) {
+                    $data['image'] = $imagePath;
+                }
+            }
+
             Announcement::create($data);
 
             if ($this->isApiRequest()) {
@@ -114,11 +123,26 @@ class AnnoncementsController extends Controller
 
             Company::findOrFail($cleaned['company_id']);
 
-            $announcement->update([
+            $data = [
                 'title' => $cleaned['title'],
                 'description' => $cleaned['description'],
                 'company_id' => $cleaned['company_id']
-            ]);
+            ];
+
+            // Handle image upload
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+                // Delete old image if exists
+                if ($announcement->image) {
+                    FileUploader::delete($announcement->image);
+                }
+                
+                $imagePath = FileUploader::upload($_FILES['image'], 'announcements/');
+                if ($imagePath) {
+                    $data['image'] = $imagePath;
+                }
+            }
+
+            $announcement->update($data);
 
             if ($this->isApiRequest()) {
                 return $this->jsonResponse(['message' => 'Announcement updated successfully']);
@@ -145,6 +169,11 @@ class AnnoncementsController extends Controller
 
         try {
             $announcement = Announcement::findOrFail($id);
+
+            if ($announcement->image) {
+                FileUploader::delete($announcement->image);
+            }
+            
             $announcement->delete();
 
             if ($this->isApiRequest()) {

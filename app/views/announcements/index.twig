@@ -21,7 +21,7 @@
     <div id="createModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
         <div class="modal-content bg-white p-6 rounded-lg shadow-lg max-w-2xl mx-auto mt-20">
             <h2 class="text-2xl font-bold mb-4">Create New Announcement</h2>
-            <form id="createForm" onsubmit="handleCreate(event)">
+            <form id="createForm" onsubmit="handleCreate(event)" enctype="multipart/form-data">
                 <input type="hidden" name="token" value="{{ csrf_token() }}">
                 
                 <div class="mb-4">
@@ -44,6 +44,12 @@
                     </select>
                 </div>
 
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="image">Image</label>
+                    <input type="file" name="image" accept="image/*" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700">
+                    <p class="text-sm text-gray-500 mt-1">Accepted formats: JPG, JPEG, PNG</p>
+                </div>
+
                 <div class="flex justify-end gap-2">
                     <button type="button" onclick="closeModal('createModal')" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
                     <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Create</button>
@@ -55,7 +61,7 @@
     <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
         <div class="modal-content bg-white p-6 rounded-lg shadow-lg max-w-2xl mx-auto mt-20">
             <h2 class="text-2xl font-bold mb-4">Edit Announcement</h2>
-            <form id="editForm" onsubmit="handleEdit(event)">
+            <form id="editForm" onsubmit="handleEdit(event)" enctype="multipart/form-data">
                 <input type="hidden" name="token" value="{{ csrf_token() }}">
                 <input type="hidden" name="id" id="edit_id">
                 
@@ -77,6 +83,13 @@
                             <option value="{{ company.id }}">{{ company.name }}</option>
                         {% endfor %}
                     </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="edit_image">Image</label>
+                    <input type="file" id="edit_image" name="image" accept="image/*" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700">
+                    <p class="text-sm text-gray-500 mt-1">Accepted formats: JPG, JPEG, PNG</p>
+                    <div id="current_image" class="mt-2"></div>
                 </div>
 
                 <div class="flex justify-end gap-2">

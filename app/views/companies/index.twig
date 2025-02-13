@@ -33,7 +33,7 @@
     <div id="createModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
         <div class="modal-content bg-white p-6 rounded-lg shadow-lg max-w-2xl mx-auto mt-20">
             <h2 class="text-2xl font-bold mb-4">Create New Company</h2>
-            <form id="createForm" onsubmit="handleCreate(event)">
+            <form id="createForm" onsubmit="handleCreate(event)" enctype="multipart/form-data">
                 <input type="hidden" name="token" value="{{ csrf_token() }}">
                 
                 <div class="mb-4">
@@ -44,6 +44,12 @@
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Description</label>
                     <textarea name="description" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" rows="4"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="logo">Logo</label>
+                    <input type="file" name="logo" accept="image/*" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700">
+                    <p class="text-sm text-gray-500 mt-1">Accepted formats: JPG, JPEG, PNG</p>
                 </div>
 
                 <div class="flex justify-end gap-2">
@@ -57,7 +63,7 @@
     <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
         <div class="modal-content bg-white p-6 rounded-lg shadow-lg max-w-2xl mx-auto mt-20">
             <h2 class="text-2xl font-bold mb-4">Edit Company</h2>
-            <form id="editForm" onsubmit="handleEdit(event)">
+            <form id="editForm" onsubmit="handleEdit(event)" enctype="multipart/form-data">
                 <input type="hidden" name="token" value="{{ csrf_token() }}">
                 <input type="hidden" name="id" id="edit_id">
                 
@@ -69,6 +75,13 @@
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="edit_description">Description</label>
                     <textarea id="edit_description" name="description" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" rows="4"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="edit_logo">Logo</label>
+                    <input type="file" id="edit_logo" name="logo" accept="image/*" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700">
+                    <p class="text-sm text-gray-500 mt-1">Accepted formats: JPG, JPEG, PNG</p>
+                    <div id="current_logo" class="mt-2"></div>
                 </div>
 
                 <div class="flex justify-end gap-2">
@@ -98,6 +111,19 @@
             document.getElementById('edit_id').value = company.id;
             document.getElementById('edit_name').value = company.name;
             document.getElementById('edit_description').value = company.description;
+            
+            // Display current logo if exists
+            const currentLogoDiv = document.getElementById('current_logo');
+            if (company.logo) {
+                currentLogoDiv.innerHTML = `
+                    <div class="mt-2">
+                        <p class="text-sm font-bold mb-1">Current Logo:</p>
+                        <img src="/${company.logo}" alt="Current logo" class="max-h-32 rounded border">
+                    </div>`;
+            } else {
+                currentLogoDiv.innerHTML = '<p class="text-sm text-gray-500">No logo uploaded</p>';
+            }
+            
             document.getElementById('editModal').classList.remove('hidden');
         }
 
@@ -120,7 +146,8 @@
                     loadCompanies();
                     event.target.reset();
                 } else {
-                    alert('Error creating company');
+                    const data = await response.json();
+                    alert(data.error || 'Error creating company');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -142,7 +169,8 @@
                     closeModal('editModal');
                     loadCompanies();
                 } else {
-                    alert('Error updating company');
+                    const data = await response.json();
+                    alert(data.error || 'Error updating company');
                 }
             } catch (error) {
                 console.error('Error:', error);

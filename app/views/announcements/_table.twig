@@ -1,15 +1,25 @@
 <table style="width: 100%; border-collapse: collapse; background-color: white;">
     <thead>
         <tr style="background-color: #2E8B57; color: white;">
-            <th style="padding: 10px; text-align: left;">Nom de la announcement</th>
+            <th style="padding: 10px; text-align: left;">Image</th>
+            <th style="padding: 10px; text-align: left;">Title</th>
             <th style="padding: 10px; text-align: left;">Description</th>
-            <th style="padding: 10px; text-align: left;">Nom de company</th>
+            <th style="padding: 10px; text-align: left;">Company</th>
             <th style="padding: 10px; text-align: center;">Actions</th>
         </tr>
     </thead>
     <tbody>
         {% for announcement in announcements %}
             <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 10px; width: 100px;">
+                    {% if announcement.image %}
+                        <img src="/{{ announcement.image }}" alt="{{ announcement.title }}" style="max-width: 80px; max-height: 80px; object-fit: contain;">
+                    {% else %}
+                        <div style="width: 80px; height: 80px; background-color: #f3f4f6; display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                            <span style="color: #9ca3af;">No Image</span>
+                        </div>
+                    {% endif %}
+                </td>
                 <td style="padding: 10px;">{{ announcement.title }}</td>
                 <td style="padding: 10px;">{{ announcement.description }}</td>
                 <td style="padding: 10px;">{{ announcement.company.name }}</td>
@@ -30,7 +40,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="4" style="padding: 10px; text-align: center;">Aucune annonce trouvée</td>
+                <td colspan="5" style="padding: 10px; text-align: center;">No announcements found</td>
             </tr>
         {% endfor %}
     </tbody>
