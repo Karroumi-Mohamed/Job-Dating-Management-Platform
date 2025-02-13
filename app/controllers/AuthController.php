@@ -75,11 +75,5 @@ class AuthController extends Controller
         exit;
     }
 
-    public function logout()
-    {
-        Auth::logout();
-        $this->success('Successfully logged out');
-        header('Location: /login');
-        exit;
-    }
+    
 }
