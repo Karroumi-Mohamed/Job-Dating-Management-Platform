@@ -1,0 +1,35 @@
+<table style="width: 100%; border-collapse: collapse; background-color: white;">
+    <thead>
+        <tr style="background-color: #2E8B57; color: white;">
+            <th style="padding: 10px; text-align: left;">Nom de la Compagnie</th>
+            <th style="padding: 10px; text-left: left;">Description</th>
+            <th style="padding: 10px; text-align: center;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for company in companies %}
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 10px;">{{ company.name }}</td>
+                <td style="padding: 10px;">{{ company.description }}</td>
+                <td style="padding: 10px; text-align: center;">
+                    <div style="display: inline-flex; align-items: center; gap: 5px;">
+                        <button onclick='openEditModal({{ company|json_encode|raw }})' title="Éditer" style="text-decoration: none; padding: 5px 10px; background-color: #2E8B57; color: white; border-radius: 5px; border: none; cursor: pointer;">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M17.414 2.586a2 2 0 010 2.828l-10 10a2 2 0 01-1.414.586H3a1 1 0 01-1-1v-3.586a2 2 0 01.586-1.414l10-10a2 2 0 012.828 0z"/>
+                            </svg>
+                        </button>
+                        <button onclick="handleDelete({{ company.id }})" title="Supprimer" style="text-decoration: none; padding: 5px 10px; background-color: #ff4d4d; color: white; border-radius: 5px; border: none; cursor: pointer;">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-.894.553L4 4H2a1 1 0 000 2h1v10a2 2 0 002 2h8a2 2 0 002-2V6h1a1 1 0 100-2h-2l-.106-.447A1 1 0 0014 2H6zm3 4a1 1 0 112 0v7a1 1 0 11-2 0V6z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3" style="padding: 10px; text-align: center;">Aucune compagnie trouvée</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

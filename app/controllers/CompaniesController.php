@@ -28,23 +28,44 @@ class CompaniesController extends Controller
         View::render('companies/create');
     }
 
+    public function getCompaniesTable()
+    {
+        $companies = Company::orderBy('name')->get();
+        return View::render('companies/_table', ['companies' => $companies], true);
+    }
+
     public function store()
     {
         $cleaned = Security::clean($_POST);
         if (!Security::validateCsrfToken($cleaned['token'])) {
-            $this->error('Invalid Request');
-            header('Location: /companies');
-            exit;
+            return $this->jsonResponse(['error' => 'Invalid Request'], 403);
         }
 
-        $data = [
-            'name' => $cleaned['name'],
-            'description' => $cleaned['description']
-        ];
+        try {
+            if (empty($cleaned['name'])) {
+                throw new \Exception('Name is required');
+            }
 
-        Company::create($data);
-        $this->success('Company created successfully');
-        header('Location: /companies');
+            $data = [
+                'name' => $cleaned['name'],
+                'description' => $cleaned['description']
+            ];
+
+            Company::create($data);
+
+            if ($this->isApiRequest()) {
+                return $this->jsonResponse(['message' => 'Company created successfully']);
+            }
+
+            $this->success('Company created successfully');
+            header('Location: /companies');
+        } catch (\Exception $e) {
+            if ($this->isApiRequest()) {
+                return $this->jsonResponse(['error' => $e->getMessage()], 400);
+            }
+            $this->error($e->getMessage());
+            header('Location: /companies/create');
+        }
         exit;
     }
 
@@ -96,23 +117,34 @@ class CompaniesController extends Controller
     {
         $cleaned = Security::clean($_POST);
         if (!Security::validateCsrfToken($cleaned['token'])) {
-            $this->error('Invalid Request');
-            header('Location: /companies');
-            exit;
+            return $this->jsonResponse(['error' => 'Invalid Request'], 403);
         }
 
         try {
             $company = Company::findOrFail($id);
+            
+            // Check for related announcements
             if ($company->announcements()->count() > 0) {
+                if ($this->isApiRequest()) {
+                    return $this->jsonResponse(['error' => 'Cannot delete company with existing announcements'], 400);
+                }
                 $this->error('Company has related announcements');
                 header('Location: /companies');
                 exit;
             }
             
             $company->delete();
+
+            if ($this->isApiRequest()) {
+                return $this->jsonResponse(['message' => 'Company deleted successfully']);
+            }
+
             $this->success('Company deleted successfully');
             header('Location: /companies');
         } catch (\Exception $e) {
+            if ($this->isApiRequest()) {
+                return $this->jsonResponse(['error' => $e->getMessage()], 400);
+            }
             $this->error('Company not found');
             header('Location: /companies');
         }
@@ -121,23 +153,55 @@ class CompaniesController extends Controller
 
     public function restore($id)
     {
-        if (!Auth::hasRole('admin')) {
-            $this->error('Unauthorized access');
+        $cleaned = Security::clean($_POST);
+        if (!Security::validateCsrfToken($cleaned['token'])) {
+            return $this->jsonResponse(['error' => 'Invalid Request'], 403);
+        }
+
+        try {
+            $company = Company::withTrashed()->findOrFail($id);
+            $company->restore();
+
+            if ($this->isApiRequest()) {
+                return $this->jsonResponse(['message' => 'Company restored successfully']);
+            }
+
+            $this->success('Company restored successfully');
+        } catch (\Exception $e) {
+            if ($this->isApiRequest()) {
+                return $this->jsonResponse(['error' => $e->getMessage()], 400);
+            }
+            $this->error('Company not found');
+        }
+
+        if (!$this->isApiRequest()) {
             header('Location: /companies');
             exit;
         }
-
-        $company = Company::withTrashed()->findOrFail($id);
-        $company->restore();
-
-        $this->success('Company restored successfully');
-        header('Location: /companies');
-        exit;
     }
 
     public function trash()
     {
         $trashCompanies = Company::onlyTrashed()->orderBy('name')->get();
         View::render('companies/trash', ['companies' => $trashCompanies]);
+    }
+
+    public function getTrashTable()
+    {
+        $companies = Company::onlyTrashed()->orderBy('name')->get();
+        return View::render('companies/_trash_table', ['companies' => $companies], true);
+    }
+
+    private function isApiRequest()
+    {
+        return strpos($_SERVER['REQUEST_URI'], '/api/') === 0;
+    }
+
+    private function jsonResponse($data, $status = 200)
+    {
+        http_response_code($status);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
     }
 }
