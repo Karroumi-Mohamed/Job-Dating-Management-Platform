@@ -3,7 +3,6 @@
 {% block content %}
 <div class="min-h-screen bg-gray-100 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Header -->
         <div class="text-center mb-8">
             <h2 class="text-3xl font-bold text-gray-900">
                 <span class="text-green-500">C</span>orbeille des Companies
@@ -11,7 +10,6 @@
             <p class="mt-2 text-gray-600">Gérer vos companies supprimées</p>
         </div>
 
-        <!-- Action Buttons -->
         <div class="mb-6 text-right space-x-2">
             <a href="/companies" class="hover:shadow-[6px_6px_#030101] px-6 py-3 bg-blue-500 text-white rounded-lg border-2 border-gray-800 hover:bg-blue-600 transition font-bold inline-flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -21,17 +19,14 @@
             </a>
         </div>
 
-        <!-- Success Alert -->
         <div id="restore-alert" class="hidden mb-4">
             <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg shadow-lg" role="alert">
                 <p class="text-green-700">La company a été restaurée avec succès!</p>
             </div>
         </div>
 
-        <!-- Table Container -->
         <div class="bg-white rounded-xl border-4 border-gray-800 shadow-lg overflow-hidden">
             <div id="trash-table">
-                <!-- Table content will be loaded here -->
             </div>
         </div>
     </div>
