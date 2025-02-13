@@ -2,9 +2,9 @@
 
 {% block content %}
     <div style="max-width: 800px; margin: auto; padding: 20px;">
-        <h2 style="text-align: center; color: #2E8B57;">Liste des Companies supprimées</h2>
+        <h2 style="text-align: center; color: #2E8B57;">Liste des Announcements supprimées</h2>
         <div style="text-align: right; margin-bottom: 20px;">
-            <a href="/companies" style="text-decoration: none; padding: 10px 15px; background-color: #2E8B57; color: white; border-radius: 5px;">Retour</a>
+            <a href="/announcements" style="text-decoration: none; padding: 10px 15px; background-color: #2E8B57; color: white; border-radius: 5px;">Retour</a>
         </div>
         <div id="trash-table">
         </div>
@@ -14,7 +14,7 @@
         document.addEventListener('DOMContentLoaded', loadTrashItems);
 
         function loadTrashItems() {
-            fetch('/api/companies/trash')
+            fetch('/api/announcements/trash')
                 .then(response => response.text())
                 .then(html => {
                     document.getElementById('trash-table').innerHTML = html;
@@ -26,24 +26,15 @@
             formData.append('token', '{{ csrf_token() }}');
 
             try {
-                const response = await fetch(`/api/companies/restore/${id}`, {
+                const response = await fetch(`/api/announcements/restore/${id}`, {
                     method: 'POST',
                     body: formData
                 });
                 
-                const data = await response.json();
-                
                 if (response.ok) {
                     loadTrashItems();
                 } else {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4';
-                    errorDiv.innerHTML = `<p>${data.error || 'Error restoring company'}</p>`;
-                    
-                    const contentDiv = document.querySelector('#trash-table').parentNode;
-                    contentDiv.insertBefore(errorDiv, contentDiv.firstChild);
-                    
-                        setTimeout(() => errorDiv.remove(), 6000);
+                    alert('Error restoring announcement');
                 }
             } catch (error) {
                 console.error('Error:', error);

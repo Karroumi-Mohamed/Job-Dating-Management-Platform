@@ -7,7 +7,6 @@ use App\Core\View;
 use App\Core\Auth;
 use App\Core\Security;
 use App\Models\User;
-use App\Models\Role;
 
 class AuthController extends Controller
 {

@@ -23,7 +23,7 @@ class Middleware
     public static function handleRole($role)
     {
         self::handle();
-        if (!Auth::hasRole($role)) {
+        if (!Auth::hasRole($role) && !Auth::hasRole('admin')) {
             header('Location: /403');
             exit();
         }
