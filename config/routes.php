@@ -4,13 +4,19 @@ use App\Controllers\AnnoncementsController;
 use App\Controllers\AuthController;
 use App\Controllers\CompaniesController;
 use App\Controllers\ListAnnouncesController;
+use App\Core\Auth;
 use App\Core\Router;
 
 Router::get('/login', [AuthController::class, 'showLogin']);
 Router::get('/register', [AuthController::class, 'showRegister']);
 Router::post('/register', [AuthController::class, 'register']);
 Router::post('/login', [AuthController::class, 'login']);
-Router::get('/logout', [AuthController::class, 'logout']);
+Router::get('/logout', function () {
+    Auth::logout();
+    header('Location: /login');
+    exit;
+});
+
 
 Router::get('/companies', [CompaniesController::class, 'index']);
 Router::get('/companies/trash', [CompaniesController::class, 'trash']);
