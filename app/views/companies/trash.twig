@@ -1,53 +1,84 @@
-{% extends "layouts/default.twig" %}
+{% extends "layouts/auth.twig" %}
 
 {% block content %}
-    <div style="max-width: 800px; margin: auto; padding: 20px;">
-        <h2 style="text-align: center; color: #2E8B57;">Liste des Companies supprimées</h2>
-        <div style="text-align: right; margin-bottom: 20px;">
-            <a href="/companies" style="text-decoration: none; padding: 10px 15px; background-color: #2E8B57; color: white; border-radius: 5px;">Retour</a>
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900">
+                <span class="text-green-500">C</span>orbeille des Companies
+            </h2>
+            <p class="mt-2 text-gray-600">Gérer vos companies supprimées</p>
         </div>
-        <div id="trash-table">
+
+        <!-- Action Buttons -->
+        <div class="mb-6 text-right space-x-2">
+            <a href="/companies" class="hover:shadow-[6px_6px_#030101] px-6 py-3 bg-blue-500 text-white rounded-lg border-2 border-gray-800 hover:bg-blue-600 transition font-bold inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                </svg>
+                Retour aux Companies
+            </a>
+        </div>
+
+        <!-- Success Alert -->
+        <div id="restore-alert" class="hidden mb-4">
+            <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-lg shadow-lg" role="alert">
+                <p class="text-green-700">La company a été restaurée avec succès!</p>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="bg-white rounded-xl border-4 border-gray-800 shadow-lg overflow-hidden">
+            <div id="trash-table">
+                <!-- Table content will be loaded here -->
+            </div>
         </div>
     </div>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', loadTrashItems);
+<script>
+    document.addEventListener('DOMContentLoaded', loadTrashItems);
 
-        function loadTrashItems() {
-            fetch('/api/companies/trash')
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('trash-table').innerHTML = html;
-                });
-        }
+    function loadTrashItems() {
+        fetch('/api/companies/trash')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('trash-table').innerHTML = html;
+            });
+    }
 
-        async function handleRestore(id) {
-            const formData = new FormData();
-            formData.append('token', '{{ csrf_token() }}');
+    async function handleRestore(id) {
+        const formData = new FormData();
+        formData.append('token', '{{ csrf_token() }}');
 
-            try {
-                const response = await fetch(`/api/companies/restore/${id}`, {
-                    method: 'POST',
-                    body: formData
-                });
+        try {
+            const response = await fetch(`/api/companies/restore/${id}`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                loadTrashItems();
+                document.getElementById('restore-alert').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('restore-alert').classList.add('hidden');
+                }, 6000);
+            } else {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4';
+                errorDiv.innerHTML = `<p>${data.error || 'Error restoring company'}</p>`;
                 
-                const data = await response.json();
+                const contentDiv = document.querySelector('#trash-table').parentNode;
+                contentDiv.insertBefore(errorDiv, contentDiv.firstChild);
                 
-                if (response.ok) {
-                    loadTrashItems();
-                } else {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4';
-                    errorDiv.innerHTML = `<p>${data.error || 'Error restoring company'}</p>`;
-                    
-                    const contentDiv = document.querySelector('#trash-table').parentNode;
-                    contentDiv.insertBefore(errorDiv, contentDiv.firstChild);
-                    
-                        setTimeout(() => errorDiv.remove(), 6000);
-                }
-            } catch (error) {
-                console.error('Error:', error);
+                setTimeout(() => errorDiv.remove(), 6000);
             }
+        } catch (error) {
+            console.error('Error:', error);
         }
-    </script>
+    }
+</script>
 {% endblock %}
