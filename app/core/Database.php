@@ -17,6 +17,15 @@ class Database
 
         self::$capsule->setAsGlobal();
         self::$capsule->bootEloquent();
+
+        if (!Capsule::schema()->hasTable('migrations')) {
+            Capsule::schema()->create('migrations', function ($table) {
+                $table->increments('id');
+                $table->string('migration');
+                $table->integer('batch');
+                $table->timestamps();
+            });
+        }
     }
 
     public function getCapsule()
