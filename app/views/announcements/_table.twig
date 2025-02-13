@@ -5,6 +5,9 @@
                 Nom de la company
             </th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                Image
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                 Nom de la announcement
             </th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
@@ -27,6 +30,15 @@
                         <div class="text-sm font-medium text-gray-900">{{ announcement.company.name }}</div>
                     </div>
                 </div>
+            </td>
+            <td class="px-6 py-4">
+                {% if announcement.image %}
+                    <img src="/assets/uploads/announcements/{{ announcement.image }}" 
+                         alt="Announcement image" 
+                         class="w-20 h-20 object-cover rounded-lg border-2 border-gray-800">
+                {% else %}
+                    <span class="text-gray-400">Aucune image</span>
+                {% endif %}
             </td>
             <td class="px-6 py-4">
                 <div class="text-sm font-medium text-gray-900">{{ announcement.title }}</div>

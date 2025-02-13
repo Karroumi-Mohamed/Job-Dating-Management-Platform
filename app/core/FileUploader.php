@@ -39,8 +39,8 @@ class FileUploader
             return false;
         }
 
-        // Return the relative path for database storage
-        return 'assets/uploads/' . $directory . $storedFileName;
+        // Return just the filename instead of the full path
+        return $storedFileName;
     }
 
     public static function delete($path)

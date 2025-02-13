@@ -42,7 +42,7 @@
             <div class="bg-white rounded-xl hover:shadow-[8px_8px_#030101] p-6 border-4 border-gray-800 hover:border-green-500 transform transition duration-200">
                 <div class="flex items-center mb-4">
                     {% if announcement.company.logo %}
-                        <img src="/uploads/companies/{{ announcement.company.logo }}" 
+                        <img src="/assets/uploads/companies/{{ announcement.company.logo }}" 
                              alt="{{ announcement.company.name }}" 
                              class="w-12 h-12 rounded-full object-cover border-2 border-gray-800">
                     {% else %}
@@ -61,7 +61,7 @@
                 {% if announcement.images and announcement.images|length > 0 %}
                     <div class="grid grid-cols-2 gap-2 mb-4">
                         {% for image in announcement.images %}
-                            <img src="/uploads/announcements/{{ image }}" 
+                            <img src="/assets/uploads/announcements/{{ image }}" 
                                  alt="Announcement image" 
                                  class="w-full h-32 object-cover rounded-lg border-2 border-gray-800">
                         {% endfor %}

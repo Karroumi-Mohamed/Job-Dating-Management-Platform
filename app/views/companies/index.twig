@@ -140,7 +140,8 @@
         const logoContainer = document.getElementById('current_logo');
         if (company.logo) {
             logoContainer.innerHTML = `
-                <img src="/uploads/companies/${company.logo}" alt="${company.name}" 
+                <img src="/assets/uploads/companies/${company.logo}" 
+                     alt="${company.name}" 
                      class="w-20 h-20 object-cover rounded-lg border-2 border-gray-800">`;
         } else {
             logoContainer.innerHTML = '';
