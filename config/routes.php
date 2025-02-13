@@ -3,9 +3,12 @@
 use App\Controllers\AnnoncementsController;
 use App\Controllers\AuthController;
 use App\Controllers\CompaniesController;
+use App\Controllers\ErrorsController;
 use App\Controllers\ListAnnouncesController;
 use App\Core\Auth;
 use App\Core\Router;
+use App\Core\View;
+use Illuminate\Support\Facades\Route;
 
 Router::get('/login', [AuthController::class, 'showLogin']);
 Router::get('/register', [AuthController::class, 'showRegister']);
@@ -16,6 +19,7 @@ Router::get('/logout', function () {
     header('Location: /login');
     exit;
 });
+
 
 
 Router::get('/companies', [CompaniesController::class, 'index']);
@@ -40,3 +44,7 @@ Router::post('/api/announcements/store', [AnnoncementsController::class, 'store'
 Router::post('/api/announcements/update/{id}', [AnnoncementsController::class, 'update']);
 Router::post('/api/announcements/delete/{id}', [AnnoncementsController::class, 'delete']);
 Router::post('/api/announcements/restore/{id}', [AnnoncementsController::class, 'restore']);
+Router::get('/404', [ErrorsController::class, 'error_404']);
+Router::get('/403', [ErrorsController::class, 'error_403']);
+
+

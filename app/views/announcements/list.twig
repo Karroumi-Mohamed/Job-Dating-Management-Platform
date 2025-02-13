@@ -20,13 +20,36 @@
             <p class="mt-2 text-gray-600">Discover your next career opportunity</p>
         </div>
 
+        {% if hasRole('admin') %}
+        <div class="mb-6 text-right space-x-2">
+            <a href="/companies" class="hover:shadow-[6px_6px_#030101] px-6 py-3 bg-blue-500 text-white rounded-lg border-2 border-gray-800 hover:bg-blue-600 transition font-bold inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h6v4H7V5zm6 6H7v2h6v-2z" clip-rule="evenodd"/>
+                </svg>
+                Gérer les Companies
+            </a>
+            <a href="/announcements" class="hover:shadow-[6px_6px_#030101] px-6 py-3 bg-green-500 text-white rounded-lg border-2 border-gray-800 hover:bg-green-600 transition font-bold inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z" clip-rule="evenodd"/>
+                </svg>
+                Gérer les Annonces
+            </a>
+        </div>
+        {% endif %}
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6  ">
             {% for announcement in announcements %}
-            <div class="bg-white rounded-xl hover:shadow-[8px_8px_#030101] p-6 border-4 border-gray-800 hover:border-green-500 transform transition duration-200 ">
+            <div class="bg-white rounded-xl hover:shadow-[8px_8px_#030101] p-6 border-4 border-gray-800 hover:border-green-500 transform transition duration-200">
                 <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center border-2 border-gray-800">
-                        <span class="text-xl font-bold">{{ announcement.company.name|slice(0, 1) }}</span>
-                    </div>
+                    {% if announcement.company.logo %}
+                        <img src="/uploads/companies/{{ announcement.company.logo }}" 
+                             alt="{{ announcement.company.name }}" 
+                             class="w-12 h-12 rounded-full object-cover border-2 border-gray-800">
+                    {% else %}
+                        <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center border-2 border-gray-800">
+                            <span class="text-xl font-bold">{{ announcement.company.name|slice(0, 1) }}</span>
+                        </div>
+                    {% endif %}
                     <div class="ml-4">
                         <h3 class="font-bold text-lg">{{ announcement.company.name }}</h3>
                     </div>
@@ -34,6 +57,16 @@
 
                 <h4 class="text-xl font-bold mb-2">{{ announcement.title }}</h4>
                 <p class="text-gray-600 mb-4">{{ announcement.description }}</p>
+
+                {% if announcement.images and announcement.images|length > 0 %}
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                        {% for image in announcement.images %}
+                            <img src="/uploads/announcements/{{ image }}" 
+                                 alt="Announcement image" 
+                                 class="w-full h-32 object-cover rounded-lg border-2 border-gray-800">
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
                 <div class="flex items-center justify-end mt-4 pt-4 border-t border-gray-200  font-bold">
                     <span class="text-sm text-gray-600">

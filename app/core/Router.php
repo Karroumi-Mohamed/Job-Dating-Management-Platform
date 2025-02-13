@@ -61,8 +61,7 @@ class Router
 
     private function notFound()
     {
-        header("HTTP/1.0 404 Not Found");
-        echo "404 - Page not found";
+       header('location: /404');
         exit;
     }
 }
