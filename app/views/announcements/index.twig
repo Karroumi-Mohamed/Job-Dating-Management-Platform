@@ -188,6 +188,17 @@
                 loadAnnouncements();
                 event.target.reset();
             } else {
+                 const data= await response.json();
+                if (data.errors) {
+                    for (const [field, messages] of Object.entries(data.errors)) {
+                        const input = event.target.querySelector(`[name="${field}"]`);
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'error-message text-red-500 text-sm mt-1';
+                        errorDiv.textContent = messages[0];
+                        input.parentNode.appendChild(errorDiv);
+                    }
+                return;
+                }
                 alert('Erreur lors de la création de l\'annonce');
             }
         } catch (error) {

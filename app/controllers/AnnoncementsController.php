@@ -9,6 +9,7 @@ use App\Core\Security;
 use App\Models\Announcement;
 use App\Models\Company;
 use App\Core\FileUploader;
+use App\Core\Validator;
 
 class AnnoncementsController extends Controller
 {
@@ -58,8 +59,12 @@ class AnnoncementsController extends Controller
             }
 
             Company::findOrFail($cleaned['company_id']);
-
-            $data = [
+            $rules = [
+                'title' => 'required|min:5|max:255',
+                'description' => 'required|min:10',
+                'company_id' => 'required|numeric'
+            ];
+             $data = [
                 'title' => $cleaned['title'],
                 'description' => $cleaned['description'],
                 'company_id' => $cleaned['company_id']
@@ -67,6 +72,18 @@ class AnnoncementsController extends Controller
 
             // Handle image upload
             if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+                $rules['image'] = 'image';
+                if (!Validator::validate(array_merge($data, $_FILES), $rules)) {
+                    if ($this->isApiRequest()) {
+                        return $this->jsonResponse([
+                            'error' => Validator::getFirstError(),
+                            'errors' => Validator::getErrors()
+                        ], 422);
+                    }
+                    $this->error(Validator::getFirstError());
+                    header('Location: /companies');
+                    exit;
+                }
                 $imagePath = FileUploader::upload($_FILES['image'], 'announcements/');
                 if ($imagePath) {
                     $data['image'] = $imagePath;
