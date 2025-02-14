@@ -10,6 +10,7 @@ use App\Core\Security;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Core\FileUploader;
+use App\Core\Validator;
 
 class CompaniesController extends Controller
 {
@@ -46,7 +47,10 @@ class CompaniesController extends Controller
             if (empty($cleaned['name'])) {
                 throw new \Exception('Name is required');
             }
-
+            $rules = [
+                'name' => 'required|min:3|max:255|unique:companies,name',
+                'description' => 'required|min:10'
+            ];
             $data = [
                 'name' => $cleaned['name'],
                 'description' => $cleaned['description']
@@ -54,15 +58,28 @@ class CompaniesController extends Controller
 
 
             if (isset($_FILES['logo']) && $_FILES['logo']['error'] === 0) {
+                $rules['logo'] = 'image';
+                if (!Validator::validate(array_merge($data, $_FILES), $rules)) {
+                    if ($this->isApiRequest()) {
+                        return $this->jsonResponse([
+                            'error' => Validator::getFirstError(),
+                            'errors' => Validator::getErrors()
+                        ], 422);
+                    }
+                    $this->error(Validator::getFirstError());
+                    header('Location: /companies');
+                    exit;
+                }
                 $logoPath = FileUploader::upload($_FILES['logo'], 'companies/');
                 if ($logoPath === false) {
                     throw new \Exception('Error uploading logo');
                 }
+
                 $data['logo'] = $logoPath;
             }
 
             $company = Company::create($data);
-            
+
 
 
             if ($this->isApiRequest()) {
@@ -103,11 +120,11 @@ class CompaniesController extends Controller
 
         try {
             $company = Company::findOrFail($id);
-            
-            if (empty($cleaned['name'])) {
-                throw new \Exception('Name is required');
-            }
-            
+
+            $rules = [
+                'name' => 'required|min:3|max:255|unique:companies,name,{$id}',
+                'description' => 'required|min:10'
+            ];
             $data = [
                 'name' => $cleaned['name'],
                 'description' => $cleaned['description']
@@ -115,17 +132,29 @@ class CompaniesController extends Controller
 
 
             if (isset($_FILES['logo']) && $_FILES['logo']['error'] === 0) {
-
+                $rules['logo']='image';
+                if (!Validator::validate(array_merge($data, $_FILES), $rules)) {
+                    if ($this->isApiRequest()) {
+                        return $this->jsonResponse([
+                            'error' => Validator::getFirstError(),
+                            'errors' => Validator::getErrors()
+                        ], 422);
+                    }
+                    $this->error(Validator::getFirstError());
+                    header('Location: /companies');
+                    exit;
+                }
                 if ($company->logo) {
                     FileUploader::delete($company->logo);
                 }
-                
+
                 $logoPath = FileUploader::upload($_FILES['logo'], 'companies/');
                 if ($logoPath) {
                     $data['logo'] = $logoPath;
                 }
             }
-            
+
+
             $company->update($data);
 
             $this->success('Company updated successfully');
@@ -159,7 +188,7 @@ class CompaniesController extends Controller
                 header('Location: /companies');
                 exit;
             }
-            
+
             $company->delete();
 
             if ($this->isApiRequest()) {
