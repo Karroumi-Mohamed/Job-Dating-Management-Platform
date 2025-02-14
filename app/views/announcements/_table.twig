@@ -5,6 +5,9 @@
                 Nom de la company
             </th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
+                Image
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
                 Nom de la announcement
             </th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-white uppercase tracking-wider">
@@ -20,13 +23,28 @@
         <tr class="hover:bg-gray-50">
             <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
-                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center border-2 border-gray-800">
+                {% if announcement.company.logo %}
+                    <img src="/assets/uploads/companies/{{ announcement.company.logo }}" 
+                        alt="{{ announcement.company.name }}" 
+                        class="w-12 h-12 rounded-full object-cover border-2 border-gray-800">     
+                {% else %}
+                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center border-2 border-gray-800">  
                         <span class="text-lg font-bold text-white">{{ announcement.company.name|slice(0, 1) }}</span>
                     </div>
+                {% endif %}
                     <div class="ml-4">
                         <div class="text-sm font-medium text-gray-900">{{ announcement.company.name }}</div>
                     </div>
                 </div>
+            </td>
+            <td class="px-6 py-4">
+                {% if announcement.image %}
+                    <img src="/assets/uploads/announcements/{{ announcement.image }}" 
+                         alt="Announcement image" 
+                         class="w-20 h-20 object-cover rounded-lg border-2 border-gray-800">
+                {% else %}
+                    <span class="text-gray-400">Aucune image</span>
+                {% endif %}
             </td>
             <td class="px-6 py-4">
                 <div class="text-sm font-medium text-gray-900">{{ announcement.title }}</div>

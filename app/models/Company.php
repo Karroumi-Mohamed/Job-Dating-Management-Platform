@@ -10,12 +10,13 @@ class Company extends Model
     use SoftDeletes;
 
     protected $table = 'companies';
-    
+
     protected $dates = ['deleted_at'];
     
     protected $fillable = [
         'name',
-        'description'
+        'description',
+        'logo'
     ];
 
     public function announcements()
