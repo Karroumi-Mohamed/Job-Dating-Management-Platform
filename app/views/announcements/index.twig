@@ -175,6 +175,7 @@
 
     async function handleCreate(event) {
         event.preventDefault();
+        clearErrors();
         const formData = new FormData(event.target);
         
         try {
@@ -208,6 +209,7 @@
 
     async function handleEdit(event) {
         event.preventDefault();
+        clearErrors();
         const formData = new FormData(event.target);
         const id = formData.get('id');
         
@@ -222,7 +224,17 @@
                 loadAnnouncements();
             } else {
                 const data = await response.json();
-                alert(data.error || 'Erreur lors de la mise à jour de l\'annonce');
+                if (data.errors) {
+                    for (const [field, messages] of Object.entries(data.errors)) {
+                        const input = event.target.querySelector(`[name="${field}"]`);
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'error-message text-red-500 text-sm mt-1';
+                        errorDiv.textContent = messages[0];
+                        input.parentNode.appendChild(errorDiv);
+                    }
+                    return;
+                }
+                alert('Error updating announcement');
             }
         } catch (error) {
             console.error('Error:', error);
@@ -273,5 +285,18 @@
             console.error('Error:', error);
         }
     }
+    
+    function clearErrors() {
+        const errorMessages = document.querySelectorAll('.error-message');
+        errorMessages.forEach(error => error.remove());
+    }
+
+    document.getElementById('createForm').addEventListener('submit', function() {
+        clearErrors();
+    });
+
+    document.getElementById('editForm').addEventListener('submit', function() {
+        clearErrors();
+    });
 </script>
 {% endblock %}
