@@ -12,7 +12,9 @@ class Validator
         'min' => 'The :field must be at least :param characters',
         'max' => 'The :field must not exceed :param characters',
         'numeric' => 'The :field must be numeric',
-        'match' => 'The :field must match :param'
+        'match' => 'The :field must match :param',
+        'image' => 'The :field must be an image (jpg, jpeg, png)',
+        'unique' => 'The :field is already taken'
     ];
 
     public static function validate($data, $rules)
@@ -21,18 +23,19 @@ class Validator
 
         foreach ($rules as $field => $fieldRules) {
             $fieldRules = explode('|', $fieldRules);
+            $value = $data[$field] ?? null;
 
             foreach ($fieldRules as $rule) {
                 $params = [];
 
                 if (strpos($rule, ':') !== false) {
                     [$rule, $param] = explode(':', $rule);
-                    $params = [$param];
+                    $params = explode(',', $param);
                 }
 
                 $method = 'validate' . ucfirst($rule);
                 if (method_exists(self::class, $method)) {
-                    self::$method($field, $data[$field] ?? null, ...$params);
+                    self::$method($field, $value, ...$params);
                 }
             }
         }
@@ -45,9 +48,14 @@ class Validator
         return self::$errors;
     }
 
+    public static function getFirstError()
+    {
+        return reset(self::$errors)[0] ?? '';
+    }
+
     protected static function validateRequired($field, $value)
     {
-        if (empty($value)) {
+        if (empty($value) && $value !== '0') {
             self::addError($field, 'required');
         }
     }
@@ -73,10 +81,34 @@ class Validator
         }
     }
 
+    protected static function validateImage($field, $value)
+    {
+        if (!empty($value['tmp_name'])) {
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            if (!in_array($value['type'], $allowedTypes)) {
+                self::addError($field, 'image');
+            }
+        }
+    }
+
+    protected static function validateUnique($field, $value, $table, $column, $except = null)
+    {
+        $query = \Illuminate\Database\Capsule\Manager::table($table)
+            ->where($column, $value);
+
+        if ($except) {
+            $query->where('id', '!=', $except);
+        }
+
+        if ($query->exists()) {
+            self::addError($field, 'unique');
+        }
+    }
+
     protected static function addError($field, $rule, $params = [])
     {
         $message = self::$rules[$rule];
-        $message = str_replace(':field', $field, $message);
+        $message = str_replace(':field', ucfirst($field), $message);
 
         foreach ($params as $key => $value) {
             $message = str_replace(':' . $key, $value, $message);

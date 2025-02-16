@@ -156,6 +156,7 @@
 
     async function handleCreate(event) {
         event.preventDefault();
+        clearErrors();
         const formData = new FormData(event.target);
         
         try {
@@ -169,6 +170,17 @@
                 loadCompanies();
                 event.target.reset();
             } else {
+                const data= await response.json();
+                if (data.errors) {
+                    for (const [field, messages] of Object.entries(data.errors)) {
+                        const input = event.target.querySelector(`[name="${field}"]`);
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'error-message text-red-500 text-sm mt-1';
+                        errorDiv.textContent = messages[0];
+                        input.parentNode.appendChild(errorDiv);
+                    }
+                return;
+                }
                 alert('Error creating company');
             }
         } catch (error) {
@@ -178,6 +190,7 @@
 
     async function handleEdit(event) {
         event.preventDefault();
+        clearErrors();
         const formData = new FormData(event.target);
         const id = formData.get('id');
         
@@ -191,6 +204,17 @@
                 closeModal('editModal');
                 loadCompanies();
             } else {
+                const data= await response.json();
+                if (data.errors) {
+                    for (const [field, messages] of Object.entries(data.errors)) {
+                        const input = event.target.querySelector(`[name="${field}"]`);
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'error-message text-red-500 text-sm mt-1';
+                        errorDiv.textContent = messages[0];
+                        input.parentNode.appendChild(errorDiv);
+                    }
+                return;
+                }
                 alert('Error updating company');
             }
         } catch (error) {
@@ -226,5 +250,18 @@
             console.error('Error:', error);
         }
     }
+
+    function clearErrors() {
+        const errorMessages = document.querySelectorAll('.error-message');
+        errorMessages.forEach(error => error.remove());
+    }
+
+    document.getElementById('createForm').addEventListener('submit', function() {
+        clearErrors();
+    });
+
+    document.getElementById('editForm').addEventListener('submit', function() {
+        clearErrors();
+    });
 </script>
 {% endblock %}

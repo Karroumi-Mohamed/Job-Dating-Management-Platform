@@ -9,6 +9,7 @@ use App\Core\Security;
 use App\Models\Announcement;
 use App\Models\Company;
 use App\Core\FileUploader;
+use App\Core\Validator;
 
 class AnnoncementsController extends Controller
 {
@@ -53,25 +54,46 @@ class AnnoncementsController extends Controller
         }
 
         try {
-            if (empty($cleaned['title']) || empty($cleaned['description']) || empty($cleaned['company_id'])) {
-                throw new \Exception('All fields are required');
-            }
-
-            Company::findOrFail($cleaned['company_id']);
-
+            $rules = [
+                'title' => 'required|min:5|max:255',
+                'description' => 'required|min:10',
+                'company_id' => 'required|numeric',
+                'image' => 'required|image'
+            ];
+            
             $data = [
                 'title' => $cleaned['title'],
                 'description' => $cleaned['description'],
                 'company_id' => $cleaned['company_id']
             ];
 
-            // Handle image upload
-            if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
-                $imagePath = FileUploader::upload($_FILES['image'], 'announcements/');
-                if ($imagePath) {
-                    $data['image'] = $imagePath;
+            if (!isset($_FILES['image']) || $_FILES['image']['error'] !== 0) {
+                if ($this->isApiRequest()) {
+                    return $this->jsonResponse(['errors' => ['image' => ['Image is required']]], 422);
                 }
+                $this->error('Image is required');
+                header('Location: /announcements');
+                exit;
             }
+
+            if (!Validator::validate(array_merge($data, $_FILES), $rules)) {
+                if ($this->isApiRequest()) {
+                    return $this->jsonResponse([
+                        'error' => Validator::getFirstError(),
+                        'errors' => Validator::getErrors()
+                    ], 422);
+                }
+                $this->error(Validator::getFirstError());
+                header('Location: /announcements');
+                exit;
+            }
+
+            $imagePath = FileUploader::upload($_FILES['image'], 'announcements/');
+            if ($imagePath === false) {
+                throw new \Exception('Error uploading image');
+            }
+
+            $data['image'] = $imagePath;
 
             Announcement::create($data);
 
@@ -117,28 +139,51 @@ class AnnoncementsController extends Controller
         try {
             $announcement = Announcement::findOrFail($id);
 
-            if (empty($cleaned['title']) || empty($cleaned['description']) || empty($cleaned['company_id'])) {
-                throw new \Exception('All fields are required');
-            }
-
-            Company::findOrFail($cleaned['company_id']);
-
+            $rules = [
+                'title' => 'required|min:5|max:255',
+                'description' => 'required|min:10',
+                'company_id' => 'required|numeric'
+            ];
+            
             $data = [
                 'title' => $cleaned['title'],
                 'description' => $cleaned['description'],
                 'company_id' => $cleaned['company_id']
             ];
 
-            // Handle image upload
             if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
-                // Delete old image if exists
+                $rules['image'] = 'image';
+                if (!Validator::validate(array_merge($data, $_FILES), $rules)) {
+                    if ($this->isApiRequest()) {
+                        return $this->jsonResponse([
+                            'error' => Validator::getFirstError(),
+                            'errors' => Validator::getErrors()
+                        ], 422);
+                    }
+                    $this->error(Validator::getFirstError());
+                    header("Location: /announcements");
+                    exit;
+                }
+
                 if ($announcement->image) {
                     FileUploader::delete($announcement->image);
                 }
-                
+
                 $imagePath = FileUploader::upload($_FILES['image'], 'announcements/');
                 if ($imagePath) {
                     $data['image'] = $imagePath;
+                }
+            } else {
+                if (!Validator::validate($data, $rules)) {
+                    if ($this->isApiRequest()) {
+                        return $this->jsonResponse([
+                            'error' => Validator::getFirstError(),
+                            'errors' => Validator::getErrors()
+                        ], 422);
+                    }
+                    $this->error(Validator::getFirstError());
+                    header("Location: /announcements");
+                    exit;
                 }
             }
 
